@@ -34,9 +34,9 @@ func (wh *WebHandler) makeConnectHandler(sh SocketHandler, timeout time.Duration
  * and receiving messages from the websockets
  * @param sc {SystemCommander}
  * @param sl {[]SocketHandler} the list of system handlers
- * @param uf {time.Duration} the update frequency for the control loop
+ * @param rate {time.Duration} the update frequency for the control loop
  */
-func (wh *WebHandler) handleWebsocketReceive(sc SystemCommander, sl []SocketHandler, uf time.Duration){
+func (wh *WebHandler) handleWebsocketReceive(sc SystemCommander, sl []SocketHandler, rate time.Duration){
 
 	defer func() {
 		sc.Stop()
@@ -44,13 +44,19 @@ func (wh *WebHandler) handleWebsocketReceive(sc SystemCommander, sl []SocketHand
 		close(wh.finishedExit)
 	}()
 
-	if uf > 0  {
-		wh.runUpdate(sc, sl, uf)
+	if rate > 0  {
+		wh.runUpdate(sc, sl, rate)
 	} else  {
 		wh.run(sc, sl)
 	}
 }
 
+/*
+ * Receive and handle messages from the websocket with (with no regular updates)
+ * @param sc {SystemCommander}
+ * @param sl {[]SocketHandler} the list of system handlers
+ * @param uf {time.Duration} the update frequency for the control loop
+ */
 func (wh *WebHandler) run(sc SystemCommander, sl []SocketHandler){
 	loop:
 	for {
@@ -68,6 +74,13 @@ func (wh *WebHandler) run(sc SystemCommander, sl []SocketHandler){
 	}
 }
 
+/*
+ * Receive and handle messages from the websocket with regular updates
+ * to the websocket handlers
+ * @param sc {SystemCommander}
+ * @param sl {[]SocketHandler} the list of system handlers
+ * @param uf {time.Duration} the update frequency for the control loop
+ */
 func (wh *WebHandler) runUpdate(sc SystemCommander, sl []SocketHandler, rate time.Duration){
 	//A ticker for taking status readings 
 	var ticker *time.Ticker 
