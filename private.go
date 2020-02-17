@@ -86,9 +86,7 @@ func (wh *WebHandler) runUpdate(sc SystemCommander, sl []SocketHandler, rate tim
 	var ticker *time.Ticker
 	ticker = time.NewTicker(rate)
 
-	defer func() {
-		ticker.Stop()
-	}()
+	defer ticker.Stop()
 
 loop:
 	for {
